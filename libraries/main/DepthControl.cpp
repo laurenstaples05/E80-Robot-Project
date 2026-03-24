@@ -34,7 +34,8 @@ void DepthControl::dive(z_state_t * state, int currentTime_in) {
   ///////////////////////////////////////////////////////////////////////
   // don't change code past this point
   ///////////////////////////////////////////////////////////////////////
-
+depth = state.z
+depth_des = wayPoints[currentWavePoint]; 
 }
 
 void DepthControl::surface(z_state_t * state) {
