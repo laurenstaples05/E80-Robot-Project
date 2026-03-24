@@ -9,7 +9,7 @@
 % specified confidence level.
 dt = 0.01; % The sampling rate
 t = 0:dt:10; % The time array
-a = 1 + sin( pi*t -pi/2); % The modeled acceleration
+a = 1 + sin( pi*t -pi/2); % CHANGE THIS TO OUR ACCELERATION DATA
 la = length(a);
 la2 = round(length(a)/5);
 a([la2:end]) = 0; % We only want one cycle of the sine wave.
@@ -19,10 +19,10 @@ preie = sqrt(2)*erfinv(confLev)*sigma*sqrt(dt); % the prefix to the sqrt(t)
 preiie = 2/3*preie; % The prefix to t^3/2a = 1 + sin( pi*t - pi/2);
 plusie=preie*t.^0.5; % The positive noise bound for one integration
 plusiie = preiie*t.^1.5; % The positive noise bound for double integration
-en = sigma*randn(1, la); % Generate the noise
+en = sigma*randn(1, la); % Generate the noise (ASK ABOUT THIS AND ABOVE CODE)
 v = cumtrapz(t,a); % Integrate the true acceleration to get the true velocity
 r = cumtrapz(t,v); % Integrate the true velocity to get the true position.
-an = a + en; % Generate the noisy measured acceleration
+an = a + en; % ALSO ASK ABOUT THIS
 vn = cumtrapz(t,an); % Integrate the measured acceleration to get the velocity
 vnp = vn + plusie; % Velocity plus confidence bound
 vnm = vn - plusie; % Velocity minus confidence bound
