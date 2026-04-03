@@ -42,9 +42,9 @@
 #define PRESSURE_PIN 14 // Teensy pin A0
 
 //pH Sensor
-#define pH_PIN 15 // Teensy pin A1
+#define PH_PIN 15 // Teensy pin A1
 
 // Thermistor Sensor
-#define pH_PIN 16 // Teensy pin A2
+#define TEMP_PIN 16 // Teensy pin A2
 
 #endif
