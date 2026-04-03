@@ -39,6 +39,12 @@
 #define MIC_PIN 23
 
 // Depth Control
-#define PRESSURE_PIN 16 // Teensy pin A0
+#define PRESSURE_PIN 14 // Teensy pin A0
+
+//pH Sensor
+#define pH_PIN 15 // Teensy pin A1
+
+// Thermistor Sensor
+#define pH_PIN 16 // Teensy pin A2
 
 #endif
