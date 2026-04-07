@@ -104,33 +104,86 @@ void setup() {
 //////////////////////////////* Loop */////////////////////////
 
 void loop() {
-  loopStartTime=millis();
-  int currentTime = millis() - loopStartTime; 
+  currentTime=millis();
+ 
 
-  if (currentTime >20000 && currentTime < 23000) {
-    motorDriver.drive(120,120,0);
-  } else if (currentTime >23000 && currentTime < 25000)  {
-    motorDriver.drive(0,0,0);
-  } else if (currentTime >25000 && currentTime < 28000)  {
-    motorDriver.drive(120,120,0);
-  } else if (currentTime >28000 && currentTime < 30000)  {
-    motorDriver.drive(0,0,0);    
-  } else if (currentTime >30000 && currentTime < 33000)  {
-    motorDriver.drive(120,120,0);
-  } else if (currentTime >33000 && currentTime < 35000)  {
-    motorDriver.drive(0,0,0);    
-  } else if (currentTime >35000 && currentTime < 38000)  {
-    motorDriver.drive(120,120,0);
-  } else if (currentTime >38000 && currentTime < 40000)  {
-    motorDriver.drive(0,0,0);    
-  } else if (currentTime 40000 && currentTime < 43000)  {
-    motorDriver.drive(120,120,0);
-  } else if (currentTime >43000 && currentTime < 45000)  {
-    motorDriver.drive(0,0,0);  
-  } else {
-        motorDriver.drive(-120,-120,0);  
+  /* ROBOT CONTROL Finite State Machine */
+  if ( currentTime-depth_control.lastExecutionTime > LOOP_PERIOD ) {
+    depth_control.lastExecutionTime = currentTime;
+    if ( depth_control.diveState ) {      // DIVE STATE //
+      depth_control.complete = false;
+      if ( !depth_control.atDepth ) {
+        depth_control.dive(&z_state_estimator.state, currentTime);
+      }
+      else {
+        depth_control.diveState = false; 
+        depth_control.surfaceState = true;
+      }
+      motor_driver.drive(0,0,depth_control.uV);
     }
-    
+    if ( depth_control.surfaceState ) {     // SURFACE STATE //
+      if ( !depth_control.atSurface ) { 
+        depth_control.surface(&z_state_estimator.state);
+      }
+      else if ( depth_control.complete ) { 
+        delete[] depth_control.wayPoints;   // destroy depth waypoint array from the Heap
+      }
+      motor_driver.drive(0,0,depth_control.uV);
+    }
+  }
+  
+  if ( currentTime-adc.lastExecutionTime > LOOP_PERIOD ) {
+    adc.lastExecutionTime = currentTime;
+    adc.updateSample(); 
+  }
+
+  if ( currentTime-ef.lastExecutionTime > LOOP_PERIOD ) {
+    ef.lastExecutionTime = currentTime;
+    attachInterrupt(digitalPinToInterrupt(ERROR_FLAG_A), EFA_Detected, LOW);
+    attachInterrupt(digitalPinToInterrupt(ERROR_FLAG_B), EFB_Detected, LOW);
+    attachInterrupt(digitalPinToInterrupt(ERROR_FLAG_C), EFC_Detected, LOW);
+    delay(5);
+    detachInterrupt(digitalPinToInterrupt(ERROR_FLAG_A));
+    detachInterrupt(digitalPinToInterrupt(ERROR_FLAG_B));
+    detachInterrupt(digitalPinToInterrupt(ERROR_FLAG_C));
+    ef.updateStates(EF_States[0],EF_States[1],EF_States[2]);
+    EF_States[0] = 1;
+    EF_States[1] = 1;
+    EF_States[2] = 1;
+  }
+
+  if ( currentTime-button_sampler.lastExecutionTime > LOOP_PERIOD ) {
+    button_sampler.lastExecutionTime = currentTime;
+    button_sampler.updateState();
+  }
+
+  if ( currentTime-imu.lastExecutionTime > LOOP_PERIOD ) {
+    imu.lastExecutionTime = currentTime;
+    imu.read();     // blocking I2C calls
+  }
+ 
+  gps.read(&GPS); // blocking UART calls, need to check for UART data every cycle
+
+  if ( currentTime-xy_state_estimator.lastExecutionTime > LOOP_PERIOD ) {
+    xy_state_estimator.lastExecutionTime = currentTime;
+    xy_state_estimator.updateState(&imu.state, &gps.state);
+  }
+
+  if ( currentTime-z_state_estimator.lastExecutionTime > LOOP_PERIOD ) {
+    z_state_estimator.lastExecutionTime = currentTime;
+    z_state_estimator.updateState(analogRead(PRESSURE_PIN));
+  }
+  
+  if ( currentTime-led.lastExecutionTime > LOOP_PERIOD ) {
+    led.lastExecutionTime = currentTime;
+    led.flashLED(&gps.state);
+  }
+
+  if ( currentTime- logger.lastExecutionTime > LOOP_PERIOD && logger.keepLogging ) {
+    logger.lastExecutionTime = currentTime;
+    logger.log();
+  }
+}
   if ( currentTime-printer.lastExecutionTime > LOOP_PERIOD ) {
     printer.lastExecutionTime = currentTime;
     printer.printValue(0,adc.printSample());
