@@ -81,7 +81,7 @@ void setup() {
   led.init();
 
 
-  depth_control.init(number_depth_waypoints, depth_waypoints, 8000);
+  depth_control.init(number_depth_waypoints, depth_waypoints, 6000);
   
   z_state_estimator.init(); 
     
