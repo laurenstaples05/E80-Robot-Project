@@ -1,11 +1,10 @@
 #ifndef __MOTOR_DRIVER_H__
 #define __MOTOR_DRIVER_H__
 
-#define NUM_MOTORS 3
+#define NUM_MOTORS 2
 
 #define MOTOR_A_INDEX 0
 #define MOTOR_B_INDEX 1
-#define MOTOR_C_INDEX 2
 #define DIRECTION_PIN 0
 #define SPEED_PIN 1
 
@@ -46,8 +45,7 @@ public:
 private:
   // pins for the motors
   int motorPins[NUM_MOTORS][2] = {{MOTOR_A_DIRECTION,MOTOR_A_SPEED},
-                                  {MOTOR_B_DIRECTION,MOTOR_B_SPEED},
-                                  {MOTOR_C_DIRECTION,MOTOR_C_SPEED}};
+                                  {MOTOR_B_DIRECTION,MOTOR_B_SPEED}};
 
   // pwm data
   unsigned int pwmValues[NUM_MOTORS]; // absolute value
