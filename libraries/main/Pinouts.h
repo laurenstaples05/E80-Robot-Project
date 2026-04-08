@@ -13,8 +13,8 @@
 #define MOTOR_B_DIRECTION 6 //IN1
 #define MOTOR_B_SPEED 5     //IN2
 // Motor C: pins 23,22 V
-#define MOTOR_C_DIRECTION 22 //IN1
-#define MOTOR_C_SPEED 23     //IN2
+//#define MOTOR_C_DIRECTION 22 //IN1
+//#define MOTOR_C_SPEED 23     //IN2
 // **********************************************************
 
 // ************ For Version 2.2 and earlier of the Motherboard
@@ -25,8 +25,8 @@
 #define MOTOR_B_FORWARD 5 //IN1
 #define MOTOR_B_REVERSE 6 //IN2
 // Motor C: pins 23,22 V
-#define MOTOR_C_FORWARD	23 //IN1
-#define MOTOR_C_REVERSE	22 //IN2
+//#define MOTOR_C_FORWARD	23 //IN1
+//#define MOTOR_C_REVERSE	22 //IN2
 // **********************************************************
 
 // Error Flags
@@ -35,8 +35,8 @@
 #define ERROR_FLAG_C 9
 
 // TOF
-#define SPEAKER_PIN 20
-#define MIC_PIN 23
+//#define SPEAKER_PIN 20
+//#define MIC_PIN 23
 
 // Depth Control
 #define PRESSURE_PIN 14 // Teensy pin A0
