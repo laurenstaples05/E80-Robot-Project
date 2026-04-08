@@ -55,7 +55,7 @@ int current_way_point = 0;
 volatile bool EF_States[NUM_FLAGS] = {1,1,1};
 
 // Depth Waypoints
-double depth waypoints[] = {0, 0.6, 1.2, 1.8, 2.4, 3, 2.4, 1.8, 1.2, 0.6, 0} // desired depths robot will stop at
+double depth_waypoints[] = {0, 0.6, 1.2, 1.8, 2.4, 3, 2.4, 1.8, 1.2, 0.6, 0};// desired depths robot will stop at
 int number_depth_waypoints = sizeof(depth_waypoints)/sizeof(depth_waypoints[0]);
 ////////////////////////* Setup *////////////////////////////////
 
@@ -86,7 +86,7 @@ void setup() {
 
   depth_control.init(number_depth_waypoints, depth_waypoints, 8000);
   
-  state_estimator.init(); 
+  z_state_estimator.init(); 
     
 
   printer.printMessage("Starting main loop",10);
