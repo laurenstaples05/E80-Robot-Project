@@ -179,11 +179,6 @@ void loop() {
  
   gps.read(&GPS); // blocking UART calls, need to check for UART data every cycle
 
-  if ( currentTime-xy_state_estimator.lastExecutionTime > LOOP_PERIOD ) {
-    xy_state_estimator.lastExecutionTime = currentTime;
-    xy_state_estimator.updateState(&imu.state, &gps.state);
-  }
-
   if ( currentTime-z_state_estimator.lastExecutionTime > LOOP_PERIOD ) {
     z_state_estimator.lastExecutionTime = currentTime;
     z_state_estimator.updateState(analogRead(PRESSURE_PIN));
