@@ -17,6 +17,7 @@ Authors:
 #include <SensorGPS.h>
 #include <SensorIMU.h>
 #include <XYStateEstimator.h>
+#include <ZStateEstimator.h>
 #include <ADCSampler.h>
 #include <ErrorFlagSampler.h>
 #include <ButtonSampler.h> // A template of a data source library
@@ -24,6 +25,7 @@ Authors:
 #include <Logger.h>
 #include <Printer.h>
 #include <SurfaceControl.h>
+#include <DepthControl.h>
 #define UartSerial Serial1
 #define DELAY 0
 #include <GPSLockLED.h>
@@ -32,8 +34,10 @@ Authors:
 /////////////////////////* Global Variables *////////////////////////
 
 MotorDriver motor_driver;
-XYStateEstimator state_estimator;
+XYStateEstimator xy_state_estimator;
+ZStateEstimator z_state_estimator;
 SurfaceControl surface_control;
+DepthControl depth_control;
 SensorGPS gps;
 Adafruit_GPS GPS(&UartSerial);
 ADCSampler adc;
@@ -62,8 +66,10 @@ void setup() {
   
   logger.include(&imu);
   logger.include(&gps);
-  logger.include(&state_estimator);
+  logger.include(&xy_state_estimator);
+  logger.include(&z_state_estimator);
   logger.include(&surface_control);
+  logger.include(&depth_control);
   logger.include(&motor_driver);
   logger.include(&adc);
   logger.include(&ef);
@@ -93,8 +99,10 @@ void setup() {
   adc.lastExecutionTime             = loopStartTime - LOOP_PERIOD + ADC_LOOP_OFFSET;
   ef.lastExecutionTime              = loopStartTime - LOOP_PERIOD + ERROR_FLAG_LOOP_OFFSET;
   button_sampler.lastExecutionTime  = loopStartTime - LOOP_PERIOD + BUTTON_LOOP_OFFSET;
-  state_estimator.lastExecutionTime = loopStartTime - LOOP_PERIOD + XY_STATE_ESTIMATOR_LOOP_OFFSET;
+  xy_state_estimator.lastExecutionTime = loopStartTime - LOOP_PERIOD + XY_STATE_ESTIMATOR_LOOP_OFFSET;
+  z_state_estimator.lastExecutionTime = loopStartTime - LOOP_PERIOD + Z_STATE_ESTIMATOR_LOOP_OFFSET;
   surface_control.lastExecutionTime = loopStartTime - LOOP_PERIOD + SURFACE_CONTROL_LOOP_OFFSET;
+  depth_control.lastExecutionTime = loopStartTime - LOOP_PERIOD + DEPTH_CONTROL_LOOP_OFFSET;
   logger.lastExecutionTime          = loopStartTime - LOOP_PERIOD + LOGGER_LOOP_OFFSET;
   burst_adc.lastExecutionTime       = loopStartTime;
 }
@@ -105,7 +113,22 @@ void setup() {
 
 void loop() {
   currentTime=millis();
- 
+    
+  if ( currentTime-printer.lastExecutionTime > LOOP_PERIOD ) {
+    printer.lastExecutionTime = currentTime;
+    printer.printValue(0,adc.printSample());
+    printer.printValue(1,button_sampler.printState());
+    printer.printValue(2,logger.printState());
+    printer.printValue(3,gps.printState());   
+    printer.printValue(4,xy_state_estimator.printState());  
+    printer.printValue(5,z_state_estimator.printState());  
+    printer.printValue(6,depth_control.printWaypointUpdate());
+    printer.printValue(7,depth_control.printString());
+    printer.printValue(8,motor_driver.printState());
+    printer.printValue(9,imu.printRollPitchHeading());        
+    printer.printValue(10,imu.printAccels());
+    printer.printToSerial();  // To stop printing, just comment this line out
+  }
 
   /* ROBOT CONTROL Finite State Machine */
   if ( currentTime-depth_control.lastExecutionTime > LOOP_PERIOD ) {
@@ -172,70 +195,6 @@ void loop() {
   if ( currentTime-z_state_estimator.lastExecutionTime > LOOP_PERIOD ) {
     z_state_estimator.lastExecutionTime = currentTime;
     z_state_estimator.updateState(analogRead(PRESSURE_PIN));
-  }
-  
-  if ( currentTime-led.lastExecutionTime > LOOP_PERIOD ) {
-    led.lastExecutionTime = currentTime;
-    led.flashLED(&gps.state);
-  }
-
-  if ( currentTime- logger.lastExecutionTime > LOOP_PERIOD && logger.keepLogging ) {
-    logger.lastExecutionTime = currentTime;
-    logger.log();
-  }
-}
-  if ( currentTime-printer.lastExecutionTime > LOOP_PERIOD ) {
-    printer.lastExecutionTime = currentTime;
-    printer.printValue(0,adc.printSample());
-    printer.printValue(1,ef.printStates());
-    printer.printValue(2,logger.printState());
-    printer.printValue(3,gps.printState());   
-    printer.printValue(4,state_estimator.printState());     
-    printer.printValue(5,surface_control.printWaypointUpdate());
-    printer.printValue(6,surface_control.printString());
-    printer.printValue(7,motor_driver.printState());
-    printer.printValue(8,imu.printRollPitchHeading());        
-    printer.printValue(9,imu.printAccels());
-    printer.printToSerial();  // To stop printing, just comment this line out
-  }
-
-
-  if ( currentTime-adc.lastExecutionTime > LOOP_PERIOD ) {
-    adc.lastExecutionTime = currentTime;
-    adc.updateSample(); 
-  }
-
-  if ( currentTime-ef.lastExecutionTime > LOOP_PERIOD ) {
-    ef.lastExecutionTime = currentTime;
-    attachInterrupt(digitalPinToInterrupt(ERROR_FLAG_A), EFA_Detected, LOW);
-    attachInterrupt(digitalPinToInterrupt(ERROR_FLAG_B), EFB_Detected, LOW);
-    attachInterrupt(digitalPinToInterrupt(ERROR_FLAG_C), EFC_Detected, LOW);
-    delay(5);
-    detachInterrupt(digitalPinToInterrupt(ERROR_FLAG_A));
-    detachInterrupt(digitalPinToInterrupt(ERROR_FLAG_B));
-    detachInterrupt(digitalPinToInterrupt(ERROR_FLAG_C));
-    ef.updateStates(EF_States[0],EF_States[1],EF_States[2]);
-    EF_States[0] = 1;
-    EF_States[1] = 1;
-    EF_States[2] = 1;
-  }
-
- // uses the ButtonSampler library to read a button -- use this as a template for new libraries!
-  if ( currentTime-button_sampler.lastExecutionTime > LOOP_PERIOD ) {
-    button_sampler.lastExecutionTime = currentTime;
-    button_sampler.updateState();
-  }
-
-  if ( currentTime-imu.lastExecutionTime > LOOP_PERIOD ) {
-    imu.lastExecutionTime = currentTime;
-    imu.read();     // blocking I2C calls
-  }
- 
-  gps.read(&GPS); // blocking UART calls, need to check for UART every cycle
-
-  if ( currentTime-state_estimator.lastExecutionTime > LOOP_PERIOD ) {
-    state_estimator.lastExecutionTime = currentTime;
-    state_estimator.updateState(&imu.state, &gps.state);
   }
   
   if ( currentTime-led.lastExecutionTime > LOOP_PERIOD ) {
