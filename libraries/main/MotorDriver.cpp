@@ -44,10 +44,10 @@ void MotorDriver::apply(void)
   }
 }
 
-void MotorDriver::drive(int motorA_power,int motorB_power,int motorC_power) {
+void MotorDriver::drive(int motorA_power,int motorB_power) {
   motorValues[MOTOR_A_INDEX] = motorA_power; //M1
   motorValues[MOTOR_B_INDEX] = motorB_power; //M2
-  motorValues[MOTOR_C_INDEX] = motorC_power; //M3
+
   apply();
   printState();
 }
@@ -55,8 +55,7 @@ void MotorDriver::drive(int motorA_power,int motorB_power,int motorC_power) {
 String MotorDriver::printState(void) {
   String printString =
     "Motors: PWMA: "  + String(pwmDir[MOTOR_A_INDEX] ? " " : "-") + String( pwmValues[MOTOR_A_INDEX] ) +  
-           " PWMB: "  + String(pwmDir[MOTOR_B_INDEX] ? " " : "-") + String( pwmValues[MOTOR_B_INDEX] ) +  
-           " PWMC: "  + String(pwmDir[MOTOR_C_INDEX] ? " " : "-") + String( pwmValues[MOTOR_C_INDEX] ) ; 
+           " PWMB: "  + String(pwmDir[MOTOR_B_INDEX] ? " " : "-") + String( pwmValues[MOTOR_B_INDEX] ) ; 
   return printString;
 }
 
