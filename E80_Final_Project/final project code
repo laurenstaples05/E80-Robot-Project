@@ -36,7 +36,6 @@ Authors:
 MotorDriver motor_driver;
 XYStateEstimator xy_state_estimator;
 ZStateEstimator z_state_estimator;
-SurfaceControl surface_control;
 DepthControl depth_control;
 SensorGPS gps;
 Adafruit_GPS GPS(&UartSerial);
@@ -55,11 +54,9 @@ int currentTime;
 int current_way_point = 0;
 volatile bool EF_States[NUM_FLAGS] = {1,1,1};
 
-// GPS Waypoints
-const int number_of_waypoints = 2;
-const int waypoint_dimensions = 2;       // waypoints are set to have two pieces of information, x then y.
-double waypoints [] = { 0, 10, 0, 0 };   // listed as x0,y0,x1,y1, ... etc.
-
+// Depth Waypoints
+double depth waypoints[] = {0, 0.6, 1.2, 1.8, 2.4, 3, 2.4, 1.8, 1.2, 0.6, 0} // desired depths robot will stop at
+int number_depth_waypoints = sizeof(depth_waypoints)/sizeof(depth_waypoints[0]);
 ////////////////////////* Setup *////////////////////////////////
 
 void setup() {
@@ -68,7 +65,6 @@ void setup() {
   logger.include(&gps);
   logger.include(&xy_state_estimator);
   logger.include(&z_state_estimator);
-  logger.include(&surface_control);
   logger.include(&depth_control);
   logger.include(&motor_driver);
   logger.include(&adc);
@@ -87,9 +83,11 @@ void setup() {
   motor_driver.init();
   led.init();
 
-  surface_control.init(number_of_waypoints, waypoints, DELAY);
+
+  depth_control.init(number_depth_waypoints, depth_waypoints, 8000);
   
   state_estimator.init(); 
+    
 
   printer.printMessage("Starting main loop",10);
   loopStartTime = millis();
@@ -101,7 +99,6 @@ void setup() {
   button_sampler.lastExecutionTime  = loopStartTime - LOOP_PERIOD + BUTTON_LOOP_OFFSET;
   xy_state_estimator.lastExecutionTime = loopStartTime - LOOP_PERIOD + XY_STATE_ESTIMATOR_LOOP_OFFSET;
   z_state_estimator.lastExecutionTime = loopStartTime - LOOP_PERIOD + Z_STATE_ESTIMATOR_LOOP_OFFSET;
-  surface_control.lastExecutionTime = loopStartTime - LOOP_PERIOD + SURFACE_CONTROL_LOOP_OFFSET;
   depth_control.lastExecutionTime = loopStartTime - LOOP_PERIOD + DEPTH_CONTROL_LOOP_OFFSET;
   logger.lastExecutionTime          = loopStartTime - LOOP_PERIOD + LOGGER_LOOP_OFFSET;
   burst_adc.lastExecutionTime       = loopStartTime;
@@ -120,13 +117,12 @@ void loop() {
     printer.printValue(1,button_sampler.printState());
     printer.printValue(2,logger.printState());
     printer.printValue(3,gps.printState());   
-    printer.printValue(4,xy_state_estimator.printState());  
-    printer.printValue(5,z_state_estimator.printState());  
-    printer.printValue(6,depth_control.printWaypointUpdate());
-    printer.printValue(7,depth_control.printString());
-    printer.printValue(8,motor_driver.printState());
-    printer.printValue(9,imu.printRollPitchHeading());        
-    printer.printValue(10,imu.printAccels());
+    printer.printValue(4,z_state_estimator.printState());  
+    printer.printValue(5,depth_control.printWaypointUpdate());
+    printer.printValue(6,depth_control.printString());
+    printer.printValue(7,motor_driver.printState());
+    printer.printValue(8,imu.printRollPitchHeading());        
+    printer.printValue(9,imu.printAccels());
     printer.printToSerial();  // To stop printing, just comment this line out
   }
 
