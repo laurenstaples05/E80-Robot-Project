@@ -119,6 +119,8 @@ void loop() {
     printer.printValue(7,motor_driver.printState());
     printer.printValue(8,imu.printRollPitchHeading());        
     printer.printValue(9,imu.printAccels());
+    printer.printValue(10, "Temp Voltage: " + String(analogRead(A2) * 3.3 / 1023.0, 2));
+    printer.printValue(11, "pH Voltage: " + String(analogRead(A1) * 3.3 / 1023.0, 2));
     printer.printToSerial();  // To stop printing, just comment this line out
   }
 
