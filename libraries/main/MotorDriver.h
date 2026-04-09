@@ -34,7 +34,7 @@ public:
   String printState(void);
 
   // helper function that sets motor command state and then applies it
-  void drive(int motorA_power,int motorB_power,int motorC_power);
+  void drive(int motorA_power,int motorB_power);
 
   // Range from -255 to +255 for full reverse or full forward
   int motorValues[NUM_MOTORS];
