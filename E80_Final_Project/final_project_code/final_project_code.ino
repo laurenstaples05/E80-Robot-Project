@@ -134,7 +134,7 @@ void loop() {
         depth_control.diveState = false; 
         depth_control.surfaceState = true;
       }
-      motor_driver.drive(depth_control.uV,depth_control.uV,0);
+      motor_driver.drive(depth_control.uV,depth_control.uV);
     }
     if ( depth_control.surfaceState ) {     // SURFACE STATE //
       if ( !depth_control.atSurface ) { 
@@ -143,7 +143,7 @@ void loop() {
       else if ( depth_control.complete ) { 
         delete[] depth_control.wayPoints;   // destroy depth waypoint array from the Heap
       }
-      motor_driver.drive(depth_control.uV,depth_control.uV,0);
+      motor_driver.drive(depth_control.uV,depth_control.uV);
     }
   }
   
