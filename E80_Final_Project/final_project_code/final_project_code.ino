@@ -8,6 +8,8 @@ Authors:
 */
 
 #include <Arduino.h>
+
+
 #include <Wire.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -45,6 +47,9 @@ Logger logger;
 Printer printer;
 GPSLockLED led;
 BurstADCSampler burst_adc;
+bool motorsEnabled = false;
+int motorEnableTime;
+#define MOTOR_START_DELAY 120000 
 
 // loop start recorder
 int loopStartTime;
@@ -58,6 +63,7 @@ int number_depth_waypoints = sizeof(depth_waypoints)/sizeof(depth_waypoints[0]);
 ////////////////////////* Setup *////////////////////////////////
 
 void setup() {
+  delay (1000);
   
   logger.include(&imu);
   logger.include(&gps);
@@ -85,6 +91,7 @@ void setup() {
   
   z_state_estimator.init(); 
     
+  motorEnableTime = millis() + MOTOR_START_DELAY;
 
   printer.printMessage("Starting main loop",10);
   loopStartTime = millis();
@@ -124,36 +131,46 @@ void loop() {
     printer.printToSerial();  // To stop printing, just comment this line out
   }
 
-  /* ROBOT CONTROL Finite State Machine */
-  if ( currentTime-depth_control.lastExecutionTime > LOOP_PERIOD ) {
+  if ( currentTime - depth_control.lastExecutionTime > LOOP_PERIOD ) {
     depth_control.lastExecutionTime = currentTime;
-    if ( depth_control.diveState ) {      // DIVE STATE //
+
+    // Enable motors after delay
+    if ( !motorsEnabled && currentTime >= motorEnableTime ) {
+      motorsEnabled = true;
+      depth_control.diveState = true;      // ← ADD THIS
+      depth_control.complete = false; 
+     depth_control.lastExecutionTime = currentTime; // reset so dive starts fresh
+    }
+
+    if ( depth_control.diveState ) {
       depth_control.complete = false;
       if ( !depth_control.atDepth ) {
         depth_control.dive(&z_state_estimator.state, currentTime);
-      }
-      else {
-        depth_control.diveState = false; 
+      } else {
+        depth_control.diveState = false;
         depth_control.surfaceState = true;
       }
-      motor_driver.drive(depth_control.uV,depth_control.uV);
+      if ( motorsEnabled ) motor_driver.drive(depth_control.uV, depth_control.uV);
     }
-    if ( depth_control.surfaceState ) {     // SURFACE STATE //
-      if ( !depth_control.atSurface ) { 
+
+    if ( depth_control.surfaceState ) {
+      if ( !depth_control.atSurface ) {
         depth_control.surface(&z_state_estimator.state);
+      } else if ( depth_control.complete ) {
+        if ( depth_control.wayPoints != nullptr ) {
+        delete[] depth_control.wayPoints;
+        depth_control.wayPoints = nullptr;    
       }
-      else if ( depth_control.complete ) { 
-        delete[] depth_control.wayPoints;   // destroy depth waypoint array from the Heap
-      }
-      motor_driver.drive(depth_control.uV,depth_control.uV);
+      if ( motorsEnabled ) motor_driver.drive(depth_control.uV, depth_control.uV);
     }
   }
+  
   
   if ( currentTime-adc.lastExecutionTime > LOOP_PERIOD ) {
     adc.lastExecutionTime = currentTime;
     adc.updateSample(); 
   }
-
+  }
   if ( currentTime-ef.lastExecutionTime > LOOP_PERIOD ) {
     ef.lastExecutionTime = currentTime;
     attachInterrupt(digitalPinToInterrupt(ERROR_FLAG_A), EFA_Detected, LOW);
