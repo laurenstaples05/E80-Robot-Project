@@ -8,7 +8,7 @@
 extern Printer printer;
 
 MotorDriver::MotorDriver()
-: DataSource("motorA,motorB,motorC","int,int,int")
+: DataSource("motorA,motorB","int,int")
 {
   for (int m = 0; m < NUM_MOTORS; m++) {
     motorValues[m] = 0;
