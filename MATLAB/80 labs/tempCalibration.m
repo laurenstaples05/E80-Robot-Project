@@ -48,7 +48,7 @@ fclose(fid);
 %% Process your data here
 
 % time vector
-t = [1,(length(A01)-1)]
+t = t = 0:(length(A02)-1)
 tSec = t.*(0.124078)
 
 
