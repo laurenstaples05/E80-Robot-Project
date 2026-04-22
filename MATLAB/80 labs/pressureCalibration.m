@@ -57,5 +57,12 @@ pressureVoltage = (A00*3.3)/1024
 
 depth = -1.39*(pressureVoltage) + 3.81
 
+% plot
+figure
+plot(tSec,depth)
+ylabel('Depth [m]')
+xlabel('Time [s]')
+title('Depth vs. Time')
+
 
 
