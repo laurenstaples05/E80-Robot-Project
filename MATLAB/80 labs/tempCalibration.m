@@ -48,7 +48,7 @@ fclose(fid);
 %% Process your data here
 
 % Convert Teensy Units to Voltage
-pHVoltage = (A01*3.3)/1024
+thermistorVoltage = (A01*3.3)/1024
 
 % Using voltage and calibration curve, convert to temp
 
