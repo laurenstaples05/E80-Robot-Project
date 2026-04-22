@@ -48,9 +48,11 @@ fclose(fid);
 %% Process your data here
 
 % Convert Teensy Units to Voltage
-pHVoltage = (A00*3.3)/1024
+pressureVoltage = (A00*3.3)/1024
 
 % Using voltage and calibration curve, convert to depth
+
+depth = -1.39*(pressureVoltage) + 3.81
 
 
 
