@@ -58,7 +58,7 @@ int current_way_point = 0;
 volatile bool EF_States[NUM_FLAGS] = {1,1,1};
 
 // Depth Waypoints
-double depth_waypoints[] = {0, 0.5, 1, 1.5, 2, 1.5, 1, 0.5, 0};// desired depths robot will stop at
+double depth_waypoints[] = {0, 0.5, 1, 0};// desired depths robot will stop at
 int number_depth_waypoints = sizeof(depth_waypoints)/sizeof(depth_waypoints[0]);
 ////////////////////////* Setup *////////////////////////////////
 
