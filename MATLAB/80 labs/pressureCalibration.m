@@ -47,7 +47,7 @@ fclose(fid);
 
 %% Process your data here
 % time vector
-t = [1,(length(A00)-1)]
+t = t = 0:(length(A00)-1)
 tSec = t.*(0.124078)
 
 % Convert Teensy Units to Voltage
