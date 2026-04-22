@@ -50,6 +50,6 @@ fclose(fid);
 % Convert Teensy Units to Voltage
 pHVoltage = (A02*3.3)/1024
 
-% Using voltage, convert to pH
+% Using voltage and calibration curve, convert to pH
 
 
