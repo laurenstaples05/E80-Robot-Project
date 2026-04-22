@@ -54,7 +54,7 @@ tSec = t.*(0.124078)
 pHVoltage = (A02*3.3)/1024
 
 % Using voltage and calibration curve, convert to pH
-pH = (pHVoltage-10.9)/-1.19
+pH = ((pHVoltage* (-0.807)) + 9.16)
 
 % plot
 figure
