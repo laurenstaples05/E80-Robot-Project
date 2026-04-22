@@ -47,3 +47,9 @@ fclose(fid);
 
 %% Process your data here
 
+% Convert Teensy Units to Voltage
+pHVoltage = (A02*3.3)/1024
+
+% Using voltage, convert to pH
+
+
