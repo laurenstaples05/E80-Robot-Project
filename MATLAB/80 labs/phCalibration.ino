@@ -51,5 +51,6 @@ fclose(fid);
 pHVoltage = (A02*3.3)/1024
 
 % Using voltage and calibration curve, convert to pH
+pH = (pHVoltage-10.9)/-1.19
 
 
