@@ -51,5 +51,6 @@ fclose(fid);
 thermistorVoltage = (A01*3.3)/1024
 
 % Using voltage and calibration curve, convert to temp
+temp = (-4.69*thermistorVoltage) + 25
 
 
