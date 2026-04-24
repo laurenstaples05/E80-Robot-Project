@@ -51,10 +51,10 @@ t = 0:(length(A01)-1);
 tSec = t.*(0.124078);
 
 % Convert Teensy Units to Voltage
-pHVoltage = (A02*3.3)/1024;
+pHVoltage = double(A02.*3.3)./1024;
 
 % Using voltage and calibration curve, convert to pH
-pH = ((pHVoltage* (-0.807)) + 9.16);
+pH = ((pHVoltage.*(-0.807)) + 9.16);
 
 % plot
 figure
