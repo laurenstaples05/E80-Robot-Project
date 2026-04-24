@@ -47,15 +47,15 @@ fclose(fid);
 
 %% Process your data here
 % time vector
-t = t = 0:(length(A00)-1)
-tSec = t.*(0.124078)
+t = 0:(length(A00)-1);
+tSec = t.*(0.124078);
 
 % Convert Teensy Units to Voltage
-pressureVoltage = (A00*3.3)/1024
+pressureVoltage = double(A00.*3.3)./1024;
 
 % Using voltage and calibration curve, convert to depth
 
-depth = -1.39*(pressureVoltage) + 3.81
+depth = -1.39.*(pressureVoltage);
 
 % plot
 figure

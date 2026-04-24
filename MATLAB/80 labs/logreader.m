@@ -4,7 +4,7 @@
 clear;
 %clf;
 
-filenum = '041'; % file number for the data you want to read
+filenum = '114'; % file number for the data you want to read
 infofile = strcat('INF', filenum, '.TXT');
 datafile = strcat('LOG', filenum, '.BIN');
 
@@ -46,6 +46,8 @@ end
 fclose(fid);
 
 %% Process your data here
-
+figure;
+t = 0:(length(A01)-1);
+plot(t,A00)
 
 

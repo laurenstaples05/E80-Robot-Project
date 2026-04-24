@@ -48,15 +48,15 @@ fclose(fid);
 %% Process your data here
 
 % time vector
-t = t = 0:(length(A02)-1)
-tSec = t.*(0.124078)
+t = 0:(length(A01)-1);
+tSec = t.*(0.124078);
 
 
 % Convert Teensy Units to Voltage
-thermistorVoltage = (A01*3.3)/1024
+thermistorVoltage = (A01*3.3)/1024;
 
 % Using voltage and calibration curve, convert to temp
-temp = (-4.69*thermistorVoltage) + 25
+temp = (-4.69*thermistorVoltage) + 25;
 
 % plot
 figure
